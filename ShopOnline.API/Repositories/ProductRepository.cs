@@ -18,14 +18,15 @@ namespace ShopOnline.API.Repositories
             return await _db.ProductCategories.ToListAsync();
         }
 
-        public Task<ProductCategory> GetCategory(int id)
+        public async Task<ProductCategory> GetCategory(int id)
         {
-            return _db.ProductCategories.SingleOrDefaultAsync(c => c.Id == id);
+            var result =await _db.ProductCategories.FindAsync(id);
+            return result;
         }
 
-        public Task<Product> GetItem(int id)
+        public async Task<Product> GetItem(int id)
         {
-            return _db.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await _db.Products.FindAsync(id);
         }
 
         public async Task<IEnumerable<Product>> GetItems()
