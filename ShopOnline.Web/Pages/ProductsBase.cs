@@ -12,7 +12,6 @@ namespace ShopOnline.Web.Pages
         protected override async Task OnInitializedAsync()
         {
             Products = await ProductService.GetItems();
-            
         }
 
         protected IOrderedEnumerable<IGrouping<int, ProductDto>> GetGroupedProductsByCategory()
