@@ -96,5 +96,28 @@ namespace ShopOnline.API.Controllers
             }
 
         }
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteItem(int id)
+        {
+            try
+            {
+                var itemToDelete = await _shoppingCartRepository.DeleteItem(id);
+                if (itemToDelete == null)
+                {
+                    return NotFound();
+                }
+
+                var product = await _productRepository.GetItem(itemToDelete.ProductId);
+                if (product == null)
+                {
+                    throw new Exception("Product is missing");
+                }
+                return Ok(itemToDelete.ConvertToDto(product));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

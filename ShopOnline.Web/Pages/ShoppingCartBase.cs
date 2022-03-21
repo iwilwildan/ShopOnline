@@ -23,5 +23,16 @@ namespace ShopOnline.Web.Pages
                 throw;
             }
         }
+
+        protected async Task DeleteCartItem_Click(int id)
+        {
+            var cartItemDeleted = await ShoppingCartService.DeleteItem(id);
+            if (cartItemDeleted != null)
+            {
+                ShoppingCartItems = ShoppingCartItems.ToList().Where(x => x.Id != id);
+            }
+        }
+
+        
     }
 }

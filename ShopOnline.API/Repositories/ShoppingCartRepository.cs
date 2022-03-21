@@ -42,9 +42,23 @@ namespace ShopOnline.API.Repositories
             return null;
         }
 
-        public Task<CartItem> DeleteItem(int id)
+        public async Task<CartItem> DeleteItem(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var itemToDelete = await _db.CartItems.FindAsync(id);
+                if (itemToDelete != null)
+                {
+                    _db.CartItems.Remove(itemToDelete);
+                    await _db.SaveChangesAsync();
+                }
+                return itemToDelete;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<IEnumerable<CartItem>> GetItems(int userId)
