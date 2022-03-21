@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ShopOnlineDbContext>(options => options.UseSqlServ
     ));
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 
 var app = builder.Build();
 
