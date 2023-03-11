@@ -1,0 +1,22 @@
+﻿@page "/ProductsByCategory/{CategoryID:int}"
+@using ShopOnline.Models.Dtos
+@inherits ProductsByCategoryBase
+
+@if (Products == null)
+{
+    <Loading/>
+}
+else
+{
+    <h3 class="mb-5">Products(@CategoryName)</h3>
+
+    var productCount = Products.Count();
+    @if (productCount > 0)
+    {
+        <div class="row mt-3">
+            <DisplayProduct Products=Products />
+        </div>
+        <hr class="mb-3" />
+        
+    }
+}
