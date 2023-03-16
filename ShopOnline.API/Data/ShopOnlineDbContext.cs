@@ -265,13 +265,17 @@ namespace ShopOnline.API.Data
 			modelBuilder.Entity<User>().HasData(new User
 			{
 				Id = 1,
-				UserName = "Bob"
+				UserName = "Bob",
+				Password = "Password",
+				Email = "my@email.com"
 
 			});
 			modelBuilder.Entity<User>().HasData(new User
 			{
 				Id = 2,
-				UserName = "Sarah"
+				UserName = "Sarah",
+				Password = "Password",
+				Email = "my@email.com"
 
 			});
 

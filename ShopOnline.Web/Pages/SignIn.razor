@@ -1,0 +1,40 @@
+﻿@page "/signin"
+@inherits SignInBase
+
+<h1>Sign In</h1>
+@if (User == null && ErrorMessage == null)
+{
+    <Loading></Loading>
+}
+else if (ShowAuthError)
+{
+    <DisplayError ErrorMessage="@ErrorMessage"></DisplayError>
+}
+
+<EditForm Model="User" OnValidSubmit="ExecuteSignIn" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group row">
+        <label for="username" class="col-md-2 col-form-label">Username</label>
+        <div class="col-md-10">
+            <InputText id="username" class="form-control" @bind-Value="User.UserName" />
+            <ValidationMessage For="@(() => User.UserName)" />
+        </div>
+
+    </div>
+    <div class="form-group row">
+        <label for="password" class="col-md-2 col-form-label">Password</label>
+        <div class="col-md-10">
+            <InputText type="password" id="password" class="form-control" @bind-Value="User.Password" />
+            <ValidationMessage For="@(() => User.Password)" />
+        </div>
+    </div>
+
+    <div class="col-md-10 text-right">
+        <button type="submit" class="btn btn-success">Sign In</button>
+    </div>
+    
+</EditForm>
+    
+

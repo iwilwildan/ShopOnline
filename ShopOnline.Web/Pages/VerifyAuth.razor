@@ -1,0 +1,28 @@
+﻿@page "/verifyauth"
+
+@using System.Security.Claims
+<h3>VerifyAuth</h3>
+@if(isAuthenticated)
+{
+    <h4>Hi @_userName welcome!</h4>
+}
+else
+{
+    <h4>the user is not authenticated</h4>
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+    private string _userName;
+    private bool isAuthenticated = false;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+        if(authState.User.Identity.IsAuthenticated)
+        {
+            isAuthenticated = true;
+            _userName = authState.User.Identity.Name + authState.User.FindFirst("userId").Value;
+        }
+    }
+}

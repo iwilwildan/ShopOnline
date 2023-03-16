@@ -100,5 +100,25 @@ namespace ShopOnline.API.Extensions
                         IconCSS = productCategory.IconCSS,
                     }).ToList();
         }
+
+        public static UserSignedDto ConvertToDto(this User user, string token)
+        {
+            return new UserSignedDto()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = token
+            };
+        }
+
+        public static CartDto ConvertToDto(this Cart cart)
+        {
+            return new CartDto()
+            {
+                Id = cart.Id,
+                UserId = cart.UserId,
+            };
+        }
     }
 }

@@ -28,7 +28,7 @@ else
             <div>
                 <button class="btn btn-success"
                     @onclick="() => (OnAddtoCart_Click(new CartItemToAddDto{
-                        CartId = HardCoded.CartId,
+                        CartId = CartId ?? 0,
                         ProductId = Product.Id,
                         Qty = 1
                     }))">

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.API.Extensions;
 using ShopOnline.API.Repositories.Contracts;
@@ -18,6 +19,7 @@ namespace ShopOnline.API.Controllers
             _productRepository = productRepository;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("{userId}/GetItems")]
         public async Task<IActionResult> GetItems(int userId)
@@ -44,7 +46,7 @@ namespace ShopOnline.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
+        [Authorize]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetItem(int id)
         {
@@ -69,7 +71,27 @@ namespace ShopOnline.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+        
+        [Authorize]
+        [HttpGet]
+        [Route("{userId}/GetCart")]
+        public async Task<IActionResult> GetCart(int userId)
+        {
+            try
+            {
+                var result = await _shoppingCartRepository.GetCart(userId);
+                if (result == null)
+                {
+                    return NotFound();
+                }
 
+                return Ok(result.ConvertToDto());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> PostItem([FromBody] CartItemToAddDto cartItemToAdd)
         {

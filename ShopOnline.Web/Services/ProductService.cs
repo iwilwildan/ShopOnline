@@ -1,5 +1,7 @@
-﻿using ShopOnline.Models.Dtos;
+﻿using Blazored.LocalStorage;
+using ShopOnline.Models.Dtos;
 using ShopOnline.Web.Services.Contracts;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace ShopOnline.Web.Services
@@ -7,16 +9,22 @@ namespace ShopOnline.Web.Services
     public class ProductService : IProductService
     {
         private readonly HttpClient _httpClient;
-
-        public ProductService(HttpClient httpClient)
+        private readonly ILocalStorageService _localStorage;
+        public ProductService(HttpClient httpClient, ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
+            _localStorage = localStorage;
         }
 
         public async Task<ProductDto> GetItem(int id)
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var result = await _httpClient.GetAsync($"api/Product/{id}");
                 if (result.IsSuccessStatusCode)
                 {
@@ -43,6 +51,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var result = await _httpClient.GetFromJsonAsync<IEnumerable<ProductDto>>("api/Product");
                 return result;
             }
@@ -57,6 +70,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var result = await _httpClient.GetFromJsonAsync<IEnumerable<ProductDto>>($"api/Product/{categoryId}/GetItemsByCategory");
                 return result;
             }
@@ -71,6 +89,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var response = await _httpClient.GetAsync("api/Product/GetProductCategories");
                 if (response.IsSuccessStatusCode)
                 {

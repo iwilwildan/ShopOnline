@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using ShopOnline.Models.Dtos;
 using ShopOnline.Web.Services.Contracts;
@@ -12,6 +13,9 @@ namespace ShopOnline.Web.Pages
         public string ErrorMessage { get; set; }
         [Inject]
         public IShoppingCartService ShoppingCartService{ get; set; }
+        [CascadingParameter]
+        public Task<AuthenticationState> AuthState { get; set; }
+        public int UserID { get; set; }
         public IEnumerable<CartItemDto> ShoppingCartItems{ get; set; }
         protected string TotalPrice { get; set; }
         protected int TotalQuantity { get; set; }
@@ -19,7 +23,12 @@ namespace ShopOnline.Web.Pages
         {
             try
             {
-                ShoppingCartItems = await ShoppingCartService.GetItems(HardCoded.UserId);
+                var authState = await AuthState;
+                if (authState.User.Identity.IsAuthenticated)
+                {
+                    UserID = Convert.ToInt32(authState.User.FindFirst("userId").Value);
+                }
+                ShoppingCartItems = await ShoppingCartService.GetItems(UserID);
                 CartChange();
             }
             catch (Exception)
@@ -79,7 +88,6 @@ namespace ShopOnline.Web.Pages
                 throw;
             }
         }
-
         private void CartChange()
         {
             CalculateCartSummary();

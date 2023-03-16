@@ -1,6 +1,8 @@
 ﻿@implements IDisposable
 
 @inject IShoppingCartService shoppingCartService
+@inject IUserService userService
+@inject NavigationManager navigationManager
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -19,12 +21,28 @@
             </NavLink>
         </div>
         <ProductCategoriesNavMenu />
-        
+
         <div class="nav-item px-3 d-sm-none">
             <NavLink class="nav-link" href="ShoppingCart">
                 <span class="fas fa-shopping-cart" aria-hidden="true"></span> Shopping Cart
                 <span class="badge bg-dark">@shoppingCartItemCount</span>
             </NavLink>
+        </div>
+        <li class="dropdown-divider"></li>
+        <div class="nav-item px-3">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <NavLink class="nav-link" href="signin">
+                        <span class="fas fa-right-to-bracket" aria-hidden="true"></span> Sign In
+                    </NavLink>
+                </NotAuthorized>
+                <Authorized>
+                    <NavLink class="nav-link" @onclick="SignOut" style="cursor: pointer">
+                        <span class="fas fa-right-from-bracket" aria-hidden="true"></span> Sign Out
+                    </NavLink>
+                </Authorized>
+            </AuthorizeView>
+
         </div>
     </nav>
 </div>
@@ -52,5 +70,10 @@
     {
         shoppingCartService.OnShoppingCartChanged -= ShoppingCartChanged;
 
+    }
+    void SignOut()
+    {
+        userService.SignOut();
+        navigationManager.NavigateTo("/", true);
     }
 }

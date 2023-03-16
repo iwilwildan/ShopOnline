@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Blazored.LocalStorage;
+using Newtonsoft.Json;
 using ShopOnline.Models.Dtos;
 using ShopOnline.Web.Services.Contracts;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -10,9 +12,12 @@ namespace ShopOnline.Web.Services
     {
         private readonly HttpClient _httpClient;
         public event Action<int> OnShoppingCartChanged;
-        public ShoppingCartService(HttpClient httpClient)
+
+        private readonly ILocalStorageService _localStorage;
+        public ShoppingCartService(HttpClient httpClient, ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
+            _localStorage = localStorage;
         }
 
 
@@ -20,6 +25,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var response = await _httpClient.PostAsJsonAsync<CartItemToAddDto>("api/ShoppingCart", itemToAdd);
                 if (response.IsSuccessStatusCode)
                 {
@@ -46,6 +56,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var response = await _httpClient.DeleteAsync($"api/ShoppingCart/{id}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -64,6 +79,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var response = await _httpClient.GetAsync($"api/ShoppingCart/{userId}/GetItems");
                 if (response.IsSuccessStatusCode)
                 {
@@ -72,6 +92,10 @@ namespace ShopOnline.Web.Services
                         return Enumerable.Empty<CartItemDto>();
                     }
                     return await response.Content.ReadFromJsonAsync<IEnumerable<CartItemDto>>();
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return Enumerable.Empty<CartItemDto>();
                 }
                 else
                 {
@@ -98,6 +122,11 @@ namespace ShopOnline.Web.Services
         {
             try
             {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
                 var jsonRequest = JsonConvert.SerializeObject(cartItemQtyUpdateDto);
                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json-patch+json");
 
@@ -113,6 +142,38 @@ namespace ShopOnline.Web.Services
 
                 throw;
             }
+        }
+
+        public async Task<CartDto> GetCart(int userId)
+        {
+            try
+            {
+                var token = await _localStorage.GetItemAsync<string>("authToken");
+                if (token is not null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                }
+                var result = await _httpClient.GetAsync($"api/ShoppingCart/{userId}/GetCart");
+                if (result.IsSuccessStatusCode)
+                {
+                    if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        return default(CartDto);
+                    }
+                    return await result.Content.ReadFromJsonAsync<CartDto>();
+                }
+                else
+                {
+                    var msg = await result.Content.ReadAsStringAsync();
+                    throw new Exception(msg);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }
