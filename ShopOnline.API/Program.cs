@@ -49,6 +49,12 @@ builder.Services.AddAuthentication(opts =>
 
 var app = builder.Build();
 
+var service = (IServiceScopeFactory)app.Services.GetService(typeof(IServiceScopeFactory));
+
+using (var db = service.CreateScope().ServiceProvider.GetService<ShopOnlineDbContext>())
+{
+    db.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
