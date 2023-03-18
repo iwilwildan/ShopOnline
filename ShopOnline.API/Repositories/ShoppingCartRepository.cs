@@ -13,7 +13,12 @@ namespace ShopOnline.API.Repositories
         public ShoppingCartRepository(ShopOnlineDbContext db, IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
-            _user = _db.Users.First(u => u.UserName == httpContextAccessor.HttpContext.User.Identity.Name);
+            var userNameContext = httpContextAccessor.HttpContext.User.Identity.Name;
+            if (userNameContext != null)
+            {
+                _user = _db.Users.First(u => u.UserName == httpContextAccessor.HttpContext.User.Identity.Name);
+            }
+            
         }
         private async Task<bool> CartItemExists(int cartId, int productId)
         {
@@ -119,6 +124,26 @@ namespace ShopOnline.API.Repositories
                          where cart.UserId == userId
                          select cart
                          ).SingleOrDefaultAsync();
+        }
+
+        public async Task<Cart> AddCart(int userId)
+        {
+            try
+            {
+                var newCart = new Cart()
+                {
+                    UserId = userId
+                };
+
+                var result = await _db.Carts.AddAsync(newCart);
+                _db.SaveChanges();
+                return result.Entity;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
         }
     }
 }

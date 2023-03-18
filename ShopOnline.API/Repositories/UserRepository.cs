@@ -37,12 +37,6 @@ namespace ShopOnline.API.Repositories
 
             var newUser = await _db.Users.AddAsync(userToAdd);
 
-            var newCart = new Cart()
-            {
-                UserId = newUser.Entity.Id
-            };
-
-            await _db.Carts.AddAsync(newCart);
             await _db.SaveChangesAsync();
 
             return userToAdd;

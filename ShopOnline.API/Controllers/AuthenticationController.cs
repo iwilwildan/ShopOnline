@@ -11,10 +11,12 @@ namespace ShopOnline.API.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IShoppingCartRepository _shopCartRepository;
 
-        public AuthenticationController(IUserRepository userRepository)
+        public AuthenticationController(IUserRepository userRepository, IShoppingCartRepository shoppingCartRepository)
         {
             _userRepository = userRepository;
+            _shopCartRepository = shoppingCartRepository;
         }
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody]UserDto userDto)
@@ -22,6 +24,7 @@ namespace ShopOnline.API.Controllers
             try
             {
                 var newUser = await _userRepository.SignUp(userDto);
+                await _shopCartRepository.AddCart(newUser.Id);
 
                 var token = JwtGenerator.GenerateUserToken(newUser.UserName, newUser.Id.ToString());
 
